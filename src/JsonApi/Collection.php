@@ -24,13 +24,20 @@ class Collection extends \Illuminate\Support\Collection
     public static function fromResponse(array $data): self
     {
         $collection = self::make(Arr::get($data, 'data'));
+
         if (Arr::has($data, 'data.0.id')) {
-            $collection = $collection->keyBy('id');
+            $collection = $collection
+                ->keyBy('id')
+                ->map(function (array $attributes) {
+                    return Item::fromResponse($attributes);
+                });
         }
 
         $collection->type = Arr::has($data, 'data.0.type');
         $collection->page = Arr::get($data, 'meta.page');
         $collection->links = Arr::get($data, 'links');
+
+        $collection->cache();
 
         return $collection;
     }

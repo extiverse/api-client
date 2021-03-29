@@ -7,7 +7,7 @@
         "guzzlehttp/psr7": "1.8.*",
         "illuminate/collections": "8.*",
         "illuminate/support": "8.*",
-        "vlucas/phpdotenv": "^3.3",
+        "vlucas/phpdotenv": "^5.2",
         "psr/cache": "^1.0",
         "cache/array-adapter": "^1.1"
     },
@@ -16,9 +16,6 @@
         "symfony/var-dumper": "*"
     },
     "autoload": {
-        "files": [
-            "src/env.php"
-        ],
         "psr-4": {
             "Extiverse\\Api\\": "src/"
         }

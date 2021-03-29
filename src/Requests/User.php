@@ -3,6 +3,7 @@
 namespace Extiverse\Api\Requests;
 
 use Extiverse\Api\Extiverse;
+use Extiverse\Api\JsonApi\Collection;
 use GuzzleHttp\Client;
 
 class User
@@ -14,10 +15,17 @@ class User
         $this->client = Extiverse::instance()->getClient($userToken);
     }
 
-    public function subscriptions(array $get)
+    public function subscriptions(array $query = []): Collection
     {
-        $response = $this->client->get('subscriptions');
+        $response = $this->client->get('subscriptions', compact('query'));
 
         return $response->getAttribute('collection');
+    }
+
+    public function me()
+    {
+        $response = $this->client->get('users/me');
+
+        return $response->getAttribute('item');
     }
 }

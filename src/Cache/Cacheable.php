@@ -9,24 +9,31 @@ use Psr\SimpleCache\CacheInterface;
 
 trait Cacheable
 {
-    public function cache(CacheInterface $cache): CacheInterface
+    public function getCache(): CacheInterface
     {
         return Extiverse::instance()->getCache();
+    }
+
+    public function cache(): self
+    {
+        $this->storeType($this->type, $this);
+
+        return $this;
     }
 
     public function storeType(string $type, $value)
     {
         /** @var Collection $collection */
-        $collection = $this->cache()->get($type, Collection::forType($type));
+        $collection = $this->getCache()->get($type, Collection::forType($type));
 
         if ($value instanceof Collection) {
-            $this->cache()->set($type, $collection = $collection->merge($value));
+            $this->getCache()->set($type, $collection = $collection->merge($value));
         }
 
         if ($value instanceof Item) {
             $collection->put($value->id, $value);
         }
 
-        $this->cache()->set($type, $collection);
+        $this->getCache()->set($type, $collection);
     }
 }

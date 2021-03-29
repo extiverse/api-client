@@ -4,10 +4,13 @@ namespace Extiverse\Api;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Dotenv\Dotenv;
+use Extiverse\Api\JsonApi\Item;
+use Extiverse\Api\Requests\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Utils;
+use Illuminate\Support\Env;
 use Psr\SimpleCache\CacheInterface;
 
 class Extiverse
@@ -17,10 +20,15 @@ class Extiverse
     protected ?bool $testing = null;
     protected ?string $token = null;
     protected ?CacheInterface $cache = null;
+    protected ?Item $me = null;
 
     private function __construct()
     {
-        (Dotenv::create(__DIR__ . '/../'))->load();
+        Dotenv::create(
+            Env::getRepository(),
+            __DIR__ . '/../',
+            '.env'
+        )->load();
     }
 
     public function getClient(string $onbehalfOf = null): Client
@@ -34,11 +42,15 @@ class Extiverse
                     'Accept' => 'application/json, application/vnd.api+json',
                     'Authorization' => 'Bearer ' . $token,
                     'User-Agent' => 'Extiverse-api-client',
+                    'X-Extiverse-By' => $this->getToken() !== $token
+                        ? $this->authoredBy()
+                        : null
                 ],
                 'verify' => $this->getTesting() === false,
                 'timeout' => 5,
                 'connect_timeout' => 2,
-                'handler' => $this->defaultMiddlewareStack()
+                'handler' => $this->defaultMiddlewareStack(),
+                'http_errors' => true,
             ]);
         }
 
@@ -87,7 +99,7 @@ class Extiverse
             $this->testing = boolval(env('TESTING'));
         }
 
-        return $this->testing;
+        return $this->testing ?? false;
     }
 
     public static function instance(): self
@@ -123,5 +135,16 @@ class Extiverse
         }
 
         return $this->cache;
+    }
+
+    private function authoredBy()
+    {
+        if (! $this->me) {
+            $this->me = (new User)->me();
+        }
+
+        return $this->me
+            ? "{$this->me->id} - {$this->me->nickname}"
+            : false;
     }
 }
