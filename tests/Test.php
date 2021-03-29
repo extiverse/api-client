@@ -2,6 +2,8 @@
 
 namespace Extiverse\Api\Tests;
 
-class Test
+use PHPUnit\Framework\TestCase;
+
+class Test extends TestCase
 {
 }
