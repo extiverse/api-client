@@ -2,28 +2,34 @@
 
 namespace Extiverse\Api;
 
+use Cache\Adapter\PHPArray\ArrayCachePool;
 use Dotenv\Dotenv;
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Utils;
+use Psr\SimpleCache\CacheInterface;
 
 class Extiverse
 {
-    static protected self $instance;
+    static protected ?self $instance = null;
     protected array $clients = [];
-    protected ?bool $testing;
-    protected ?string $token;
+    protected ?bool $testing = null;
+    protected ?string $token = null;
+    protected ?CacheInterface $cache = null;
 
-    protected function __construct()
+    private function __construct()
     {
         (Dotenv::create(__DIR__ . '/../'))->load();
     }
 
-    public function getClient(?string $onbehalfOf): Client
+    public function getClient(string $onbehalfOf = null): Client
     {
         $token = $onbehalfOf ?: $this->getToken();
 
-        if (array_key_exists($token, $this->clients)) {
+        if (! array_key_exists($token, $this->clients)) {
             $this->clients[$token] = new Client([
-                'base_uri' => $this->testing ? 'http://extiverse.test/api/v1' : 'https://extiverse.com/api/v1',
+                'base_uri' => $this->getTesting() ? 'http://extiverse.test/api/v1/' : 'https://extiverse.com/api/v1/',
                 'headers' => [
                     'Accept' => 'application/json, application/vnd.api+json',
                     'Authorization' => 'Bearer ' . $token,
@@ -32,6 +38,7 @@ class Extiverse
                 'verify' => $this->getTesting() === false,
                 'timeout' => 5,
                 'connect_timeout' => 2,
+                'handler' => $this->defaultMiddlewareStack()
             ]);
         }
 
@@ -86,9 +93,35 @@ class Extiverse
     public static function instance(): self
     {
         if (! static::$instance) {
-            static::$instance = new self;
+            static::$instance = new Extiverse;
         }
 
         return static::$instance;
+    }
+
+    private function defaultMiddlewareStack(): HandlerStack
+    {
+        $stack = new HandlerStack;
+        $stack->setHandler(Utils::chooseHandler());
+
+        $stack->push(Middleware::mapResponse(new Guzzle\JsonApiParserMiddleware));
+
+        return $stack;
+    }
+
+    public function setCache(CacheInterface $cache): self
+    {
+        $this->cache = $cache;
+
+        return $this;
+    }
+
+    public function getCache(): CacheInterface
+    {
+        if (! $this->cache) {
+            $this->cache = new ArrayCachePool(1000);
+        }
+
+        return $this->cache;
     }
 }
