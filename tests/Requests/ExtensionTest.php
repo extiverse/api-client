@@ -19,6 +19,7 @@ class ExtensionTest extends Test
 
         $this->assertTrue($item instanceof Item);
         $this->assertEquals('flarum/tags', $item->name);
+        $this->assertNotNull($item['is-premium']);
     }
 
     /**
