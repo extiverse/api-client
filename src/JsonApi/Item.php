@@ -26,7 +26,7 @@ class Item extends Fluent
             }
 
             if ($type = Arr::get($value, "data.0.type")) {
-                $item->relations[$relation] = new Relation\HasMany($type, Arr::pluck($value, 'data.id'));
+                $item->relations[$relation] = new Relation\HasMany($type, Arr::pluck($value['data'], 'id'));
             }
         }
 

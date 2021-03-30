@@ -31,9 +31,19 @@ class ExtensionTest extends Test
 
         $this->assertTrue($collection instanceof Collection);
         $this->assertTrue($collection->isNotEmpty());
+    }
 
-
+    /**
+     * @test
+     * @covers \Extiverse\Api\Requests\Extension::index
+     */
+    public function indexSubscribed()
+    {
         $collection = (new Extension)->index(['include' => 'plans', 'filter[is]' => 'subscribed']);
         $this->assertTrue($collection->isNotEmpty());
+
+        $extension = $collection->first();
+
+        $this->assertNotEmpty($extension->plans);
     }
 }
