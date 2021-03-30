@@ -14,30 +14,25 @@ trait Cacheable
         return Extiverse::instance()->getCache();
     }
 
-    public function cache(): self
-    {
-        $this->storeType($this->type, $this);
-
-        return $this;
-    }
-
     public function typeCollection(): Collection
     {
         return $this->getCache()->get($this->type, Collection::forType($this->type));
     }
 
-    public function storeType(string $type, $value)
+    public function cache(): self
     {
         $collection = $this->typeCollection();
 
-        if ($value instanceof Collection) {
-            $collection = $collection->merge($value);
+        if ($this instanceof Collection) {
+            $collection = $collection->merge($this);
         }
 
-        if ($value instanceof Item) {
-            $collection->put($value->id, $value);
+        if ($this instanceof Item) {
+            $collection->put($this->id, $this);
         }
 
-        $this->getCache()->set($collection->type, $collection);
+        $this->getCache()->set($collection->getType(), $collection);
+
+        return $this;
     }
 }

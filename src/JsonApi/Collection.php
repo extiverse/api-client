@@ -11,7 +11,7 @@ class Collection extends \Illuminate\Support\Collection
 
     protected array $page = [];
     protected array $links = [];
-    public ?string $type = null;
+    protected ?string $type = null;
 
     public static function forType(string $type): self
     {
@@ -32,13 +32,18 @@ class Collection extends \Illuminate\Support\Collection
                     return Item::fromResponse($attributes);
                 });
         }
-        
-        $collection->type = $collection->first()->type;
+
+        $collection->type = $collection->first()->type ?? null;
         $collection->page = Arr::get($data, 'meta.page');
         $collection->links = Arr::get($data, 'links');
 
         $collection->cache();
 
         return $collection;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type ?? $this->first()->type ?? null;
     }
 }

@@ -28,7 +28,7 @@ class Extiverse
             Env::getRepository(),
             __DIR__ . '/../',
             '.env'
-        )->load();
+        )->safeLoad();
     }
 
     public function getClient(string $onbehalfOf = null): Client
@@ -64,12 +64,6 @@ class Extiverse
         return $this;
     }
 
-    /**
-     * Enables testing features during development.
-     *
-     * @param bool $testing
-     * @return $this
-     */
     public function setTesting(bool $testing = true): self
     {
         $this->testing = $testing;

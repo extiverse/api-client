@@ -5,7 +5,7 @@ namespace Extiverse\Api\Errors;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Str;
 
-class RequestException extends \Exception
+class UnauthorizedException extends \Exception
 {
     private int $status;
     private Response $response;
@@ -20,11 +20,7 @@ class RequestException extends \Exception
 
     private function setMessage()
     {
-        $message = "HTTP response error {$this->status}.";
-
-        $message .= Str::limit($this->response->getBody()->getContents(), 1000);
-
-        return $message;
+        return "HTTP response error {$this->status}. Invalid token.";
     }
 
     public function getResponse(): Response
