@@ -18,6 +18,12 @@ class UserTest extends Test
         $collection = (new User(env('USER_TOKEN')))->subscriptions(['include' => 'extension,plan']);
 
         $this->assertTrue($collection instanceof Collection);
+
+        $subscription = $collection->first();
+
+        $this->assertTrue($subscription instanceof Item);
+        $this->assertTrue($subscription->plan instanceof Item);
+        $this->assertTrue($subscription->plan->subscribed);
     }
 
     /**

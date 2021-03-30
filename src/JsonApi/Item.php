@@ -38,7 +38,7 @@ class Item extends Fluent
     public function __get($key)
     {
         if (array_key_exists($key, $this->relations)) {
-
+            return $this->relations[$key]->get();
         }
 
         return parent::__get($key);
