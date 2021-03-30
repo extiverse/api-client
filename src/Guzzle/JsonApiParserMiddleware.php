@@ -2,6 +2,7 @@
 
 namespace Extiverse\Api\Guzzle;
 
+use Extiverse\Api\Errors\RequestException;
 use Extiverse\Api\JsonApi\Collection;
 use Extiverse\Api\JsonApi\Item;
 use Extiverse\Api\JsonApi\Response as JsonApiResponse;
@@ -17,6 +18,10 @@ class JsonApiParserMiddleware
             $response->getHeaders(),
             $response->getBody(),
         );
+
+        if ($response->getStatusCode() >= 500) {
+            throw new RequestException($response->getStatusCode(), $response);
+        }
 
         if (in_array('application/vnd.api+json', $response->getHeader('Content-Type'))) {
             $body = json_decode($response->getBody()->getContents(), true);

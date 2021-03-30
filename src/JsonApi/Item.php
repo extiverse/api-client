@@ -12,6 +12,7 @@ class Item extends Fluent
 
     public $id = null;
     public ?string $type = null;
+    public array $relations = [];
 
     public static function fromResponse(array $data): Item
     {
@@ -19,8 +20,27 @@ class Item extends Fluent
         $item->id = Arr::get($data, 'id');
         $item->type = Arr::get($data, 'type');
 
+        foreach (Arr::get($data, 'relationships', []) as $relation => $value) {
+            if ($type = Arr::get($value, 'data.type')) {
+                $item->relations[$relation] = new Relation\HasOne($type, Arr::get($value, 'data.id'));
+            }
+
+            if ($type = Arr::get($value, "data.0.type")) {
+                $item->relations[$relation] = new Relation\HasMany($type, Arr::pluck($value, 'data.id'));
+            }
+        }
+
         $item->cache();
 
         return $item;
+    }
+
+    public function __get($key)
+    {
+        if (array_key_exists($key, $this->relations)) {
+
+        }
+
+        return parent::__get($key);
     }
 }

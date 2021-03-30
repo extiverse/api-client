@@ -21,19 +21,23 @@ trait Cacheable
         return $this;
     }
 
+    public function typeCollection(): Collection
+    {
+        return $this->getCache()->get($this->type, Collection::forType($this->type));
+    }
+
     public function storeType(string $type, $value)
     {
-        /** @var Collection $collection */
-        $collection = $this->getCache()->get($type, Collection::forType($type));
+        $collection = $this->typeCollection();
 
         if ($value instanceof Collection) {
-            $this->getCache()->set($type, $collection = $collection->merge($value));
+            $collection = $collection->merge($value);
         }
 
         if ($value instanceof Item) {
             $collection->put($value->id, $value);
         }
 
-        $this->getCache()->set($type, $collection);
+        $this->getCache()->set($collection->type, $collection);
     }
 }

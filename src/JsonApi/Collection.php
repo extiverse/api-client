@@ -11,9 +11,9 @@ class Collection extends \Illuminate\Support\Collection
 
     protected array $page = [];
     protected array $links = [];
-    protected ?string $type = null;
+    public ?string $type = null;
 
-    public static function forType(string $type)
+    public static function forType(string $type): self
     {
         $collection = self::make();
         $collection->type = $type;
@@ -32,8 +32,8 @@ class Collection extends \Illuminate\Support\Collection
                     return Item::fromResponse($attributes);
                 });
         }
-
-        $collection->type = Arr::has($data, 'data.0.type');
+        
+        $collection->type = $collection->first()->type;
         $collection->page = Arr::get($data, 'meta.page');
         $collection->links = Arr::get($data, 'links');
 
