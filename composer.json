@@ -5,9 +5,8 @@
     "require": {
         "guzzlehttp/guzzle": "7.3.*",
         "guzzlehttp/psr7": "1.8.*",
-        "illuminate/collections": "8.*",
-        "illuminate/support": "8.*",
-        "vlucas/phpdotenv": "^5.2",
+        "illuminate/support": "6.*",
+        "vlucas/phpdotenv": "^3.3",
         "psr/cache": "^1.0",
         "cache/array-adapter": "^1.1"
     },

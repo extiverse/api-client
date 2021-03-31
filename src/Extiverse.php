@@ -24,11 +24,7 @@ class Extiverse
 
     private function __construct()
     {
-        Dotenv::create(
-            Env::getRepository(),
-            __DIR__ . '/../',
-            '.env'
-        )->safeLoad();
+        Dotenv::create(__DIR__ . '/../')->safeLoad();
     }
 
     public function getClient(string $onbehalfOf = null): Client
@@ -131,7 +127,7 @@ class Extiverse
         return $this->cache;
     }
 
-    private function authoredBy()
+    private function authoredBy(): ?string
     {
         if (! $this->me) {
             $this->me = (new User)->me();
@@ -139,6 +135,6 @@ class Extiverse
 
         return $this->me
             ? "{$this->me->id} - {$this->me->nickname}"
-            : false;
+            : null;
     }
 }
