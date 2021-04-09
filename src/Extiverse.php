@@ -10,7 +10,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Utils;
-use Illuminate\Support\Env;
 use Psr\SimpleCache\CacheInterface;
 
 class Extiverse
