@@ -23,7 +23,7 @@ class Extiverse
 
     private function __construct()
     {
-        Dotenv::create(__DIR__ . '/../')->safeLoad();
+        Dotenv::createMutable([__DIR__ . '/../'])->safeLoad();
     }
 
     public function getClient(string $onbehalfOf = null): Client
