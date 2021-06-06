@@ -4,13 +4,19 @@ namespace Extiverse\Api;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Dotenv\Dotenv;
-use Extiverse\Api\JsonApi\Item;
+use Extiverse\Api\JsonApi\Parser\DocumentParser;
+use Extiverse\Api\JsonApi\Types\TypeMapper;
 use Extiverse\Api\Requests\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Utils;
 use Psr\SimpleCache\CacheInterface;
+use Swis\JsonApi\Client\Client as SwisClient;
+use Swis\JsonApi\Client\DocumentClient;
+use Swis\JsonApi\Client\Interfaces\DocumentClientInterface;
+use Swis\JsonApi\Client\Interfaces\TypeMapperInterface;
+use Swis\JsonApi\Client\Parsers\ResponseParser;
 
 class Extiverse
 {
@@ -26,30 +32,41 @@ class Extiverse
         Dotenv::createMutable([__DIR__ . '/../'])->safeLoad();
     }
 
-    public function getClient(string $onbehalfOf = null): Client
+    public function getClient(string $onbehalfOf = null): DocumentClientInterface
     {
         $token = $onbehalfOf ?: $this->getToken();
 
         if (! array_key_exists($token, $this->clients)) {
-            $this->clients[$token] = new Client([
-                'base_uri' => $this->getTesting() ? 'http://extiverse.test/api/v1/' : 'https://extiverse.com/api/v1/',
-                'headers' => [
-                    'Accept' => 'application/json, application/vnd.api+json',
-                    'Authorization' => 'Bearer ' . $token,
-                    'User-Agent' => 'Extiverse-api-client',
-                    'X-Extiverse-By' => $this->getToken() !== $token
-                        ? $this->authoredBy()
-                        : null
-                ],
-                'verify' => $this->getTesting() === false,
-                'timeout' => 5,
-                'connect_timeout' => 2,
-                'handler' => $this->defaultMiddlewareStack(),
-                'http_errors' => true,
-            ]);
+            $this->generateClient($token);
         }
 
         return $this->clients[$token];
+    }
+
+    protected function generateClient(string $token)
+    {
+         $http = new Client([
+            'base_uri' => $this->getTesting()
+                ? 'http://extiverse.test/api/v1/'
+                : 'https://extiverse.com/api/v1/',
+            'headers' => [
+                'Accept' => 'application/json, application/vnd.api+json',
+                'Authorization' => 'Bearer ' . $token,
+                'User-Agent' => 'Extiverse-api-client',
+                'X-Extiverse-By' => $this->getToken() !== $token
+                    ? $this->authoredBy()
+                    : null
+            ],
+            'verify' => $this->getTesting() === false,
+            'timeout' => 5,
+            'connect_timeout' => 2,
+            'http_errors' => true,
+        ]);
+
+        $this->clients[$token] = new DocumentClient(
+            new SwisClient($http),
+            new ResponseParser(DocumentParser::create(new TypeMapper))
+        );
     }
 
     public function setClient(Client $client, string $token): self
