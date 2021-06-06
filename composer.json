@@ -2,6 +2,14 @@
     "name": "extiverse/api-client",
     "description": "Client for the extiverse.com API.",
     "license": "MIT",
+    "homepage": "https://extiverse.com",
+    "authors": [
+        {
+            "name": "Daniël Klabbers",
+            "email": "daniel@klabbers.email",
+            "homepage": "http://luceos.com"
+        }
+    ],
     "require": {
         "php": ">= 7.4",
         "guzzlehttp/guzzle": "7.3.*",
