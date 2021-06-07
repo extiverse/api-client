@@ -31,6 +31,7 @@ class UpdatesChecker
                 return $response->getData();
             })
             ->collapse()
+            ->sortBy('attributes.name')
             ->map(function (Extension $extension) {
                 $installed = $this->extensions->getExtension($extension->flarumId());
 
@@ -39,7 +40,8 @@ class UpdatesChecker
                 $extension->setAttribute('needs-update', $this->needsUpdate($extension['current-version'], $extension['highest-version']));
 
                 return $extension;
-            });
+            })
+            ->values();
     }
 
     protected function needsUpdate(string $currentVersion, string $highestVersion = null): bool
