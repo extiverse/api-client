@@ -6,6 +6,7 @@ use Composer\Semver\Comparator;
 use Extiverse\Api\JsonApi\Repositories\ExtensionRepository;
 use Extiverse\Api\JsonApi\Types\Extension\Extension;
 use Flarum\Extension\ExtensionManager;
+use Flarum\Foundation\Application;
 use Illuminate\Support\Collection;
 
 class UpdatesChecker
@@ -17,6 +18,19 @@ class UpdatesChecker
         $this->extensions = $extensions;
     }
 
+    public function core(): Extension
+    {
+        $response = $this->repository()->find('flarum$core');
+
+        /** @var Extension $core */
+        $core = $response->getData();
+        $core->setAttribute('current-version', Application::VERSION);
+        $core->setAttribute('enabled', true);
+        $core->setAttribute('needs-update', $this->needsUpdate($core['current-version'], $core['highest-version']));
+
+        return $core;
+    }
+
     public function process(): Collection
     {
         return $this->extensions->getExtensions()
@@ -26,7 +40,7 @@ class UpdatesChecker
             })
             ->chunk(15)
             ->map(function ($chunk) {
-                $response = (new ExtensionRepository)->all(['filter[batch]' => $chunk->implode(',')]);
+                $response = $this->repository()->all(['filter[batch]' => $chunk->implode(',')]);
 
                 return $response->getData();
             })
@@ -49,5 +63,10 @@ class UpdatesChecker
         if (!$highestVersion || substr($currentVersion, 0, 4) === 'dev-')  return false;
 
         return Comparator::compare($currentVersion, '<', $highestVersion);
+    }
+
+    protected function repository(): ExtensionRepository
+    {
+        return new ExtensionRepository;
     }
 }
