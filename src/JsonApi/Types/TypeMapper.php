@@ -15,7 +15,7 @@ class TypeMapper extends Mapper
     {
         foreach($this->types as $type) {
             /** @var ItemInterface $type */
-            $type = resolve($type);
+            $type = new $type;
             $this->setMapping($type->getType(), get_class($type));
         }
     }

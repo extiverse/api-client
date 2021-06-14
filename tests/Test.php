@@ -3,15 +3,17 @@
 namespace Extiverse\Tests;
 
 use Extiverse\Api\Extiverse;
+use Extiverse\Api\JsonApi\Repositories\Repository;
 use PHPUnit\Framework\TestCase;
 
 abstract class Test extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
+    protected ?string $repository = null;
 
-        // Boots env()
-        Extiverse::instance();
+    protected function getRepository(): ?Repository
+    {
+        return $this->repository
+            ? new $this->repository()
+            : null;
     }
 }
