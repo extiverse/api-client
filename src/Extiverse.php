@@ -7,7 +7,7 @@ use Dotenv\Dotenv;
 use Extiverse\Api\JsonApi\Parser\DocumentParser;
 use Extiverse\Api\JsonApi\Repositories\UserRepository;
 use Extiverse\Api\JsonApi\Types\TypeMapper;
-use Extiverse\Api\Requests\User;
+use Extiverse\Api\JsonApi\Types\User\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -26,7 +26,7 @@ class Extiverse
     protected ?bool $testing = null;
     protected ?string $token = null;
     protected ?CacheInterface $cache = null;
-    protected ?Item $me = null;
+    protected ?User $me = null;
 
     private function __construct()
     {
