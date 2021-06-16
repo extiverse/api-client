@@ -5,6 +5,7 @@ namespace Extiverse\Api;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Dotenv\Dotenv;
 use Extiverse\Api\JsonApi\Parser\DocumentParser;
+use Extiverse\Api\JsonApi\Repositories\UserRepository;
 use Extiverse\Api\JsonApi\Types\TypeMapper;
 use Extiverse\Api\Requests\User;
 use GuzzleHttp\Client;
@@ -146,7 +147,7 @@ class Extiverse
     private function authoredBy(): ?string
     {
         if (! $this->me) {
-            $this->me = (new User)->me();
+            $this->me = (new UserRepository)->me();
         }
 
         return $this->me
