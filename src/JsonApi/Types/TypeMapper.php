@@ -9,6 +9,7 @@ class TypeMapper extends Mapper
 {
     protected array $types = [
         Extension\Extension::class,
+        User\User::class,
     ];
 
     public function __construct()
