@@ -12,6 +12,7 @@
     ],
     "require": {
         "php": ">= 7.4",
+        "ext-json": "*",
         "guzzlehttp/guzzle": "7.3.*",
         "guzzlehttp/psr7": "1.8.*",
         "illuminate/support": "8.*",

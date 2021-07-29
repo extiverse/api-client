@@ -46,28 +46,46 @@ class Extiverse
 
     protected function generateClient(string $token)
     {
-         $http = new Client([
-            'base_uri' => $this->getTesting()
-                ? 'http://extiverse.test/api/v1/'
-                : 'https://extiverse.com/api/v1/',
-            'headers' => [
-                'Accept' => 'application/json, application/vnd.api+json',
-                'Authorization' => 'Bearer ' . $token,
-                'User-Agent' => 'Extiverse-api-client',
-                'X-Extiverse-By' => $this->getToken() !== $token
-                    ? $this->authoredBy()
-                    : null
-            ],
-            'verify' => $this->getTesting() === false,
-            'timeout' => 5,
-            'connect_timeout' => 2,
-            'http_errors' => true,
-        ]);
+        $http = $this->generateGuzzleClient($token);
 
         $this->clients[$token] = new DocumentClient(
             new SwisClient($http),
             new ResponseParser(DocumentParser::create(new TypeMapper))
         );
+    }
+
+    public function generateGuzzleClient(string $token = null, bool $api = true)
+    {
+        $token = $token ?? $this->getToken();
+
+        $headers = [
+            'Accept' => 'application/json, application/vnd.api+json',
+            'Authorization' => 'Bearer ' . $token,
+            'User-Agent' => 'Extiverse-api-client',
+            'X-Extiverse-By' => $this->getToken() !== $token
+                ? $this->authoredBy()
+                : null
+        ];
+
+        if ($token) {
+            $headers['Authorization'] = "Bearer $token";
+            $headers['X-Extiverse-By'] = $this->getToken() !== $token ? $this->authoredBy() : null;
+        }
+
+        $baseUri = $this->getTesting()
+            ? 'http://extiverse.test/'
+            : 'https://extiverse.com/';
+
+        if ($api) $baseUri .= "api/v1/";
+
+        return new Client([
+            'base_uri' => $baseUri,
+            'headers' => $headers,
+            'verify' => $this->getTesting() === false,
+            'timeout' => 5,
+            'connect_timeout' => 2,
+            'http_errors' => true,
+        ]);
     }
 
     public function setClient(Client $client, string $token): self
@@ -116,16 +134,6 @@ class Extiverse
         }
 
         return static::$instance;
-    }
-
-    private function defaultMiddlewareStack(): HandlerStack
-    {
-        $stack = new HandlerStack;
-        $stack->setHandler(Utils::chooseHandler());
-
-        $stack->push(Middleware::mapResponse(new Guzzle\JsonApiParserMiddleware));
-
-        return $stack;
     }
 
     public function setCache(CacheInterface $cache): self
