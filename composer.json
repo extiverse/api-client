@@ -14,7 +14,7 @@
         "php": ">= 7.4",
         "ext-json": "*",
         "guzzlehttp/guzzle": "7.3.*",
-        "guzzlehttp/psr7": "1.8.*",
+        "guzzlehttp/psr7": "~1.1 || ^2.0",
         "illuminate/support": "8.*",
         "vlucas/phpdotenv": "^5.2",
         "psr/cache": "^1.0",
