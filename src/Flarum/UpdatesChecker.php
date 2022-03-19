@@ -60,6 +60,14 @@ class UpdatesChecker
 
     protected function needsUpdate(string $currentVersion, string $highestVersion = null): bool
     {
+        $currentVersion = preg_match('/^v[0-9]/', $currentVersion)
+            ? substr($currentVersion, 1)
+            : $currentVersion;
+
+        $highestVersion = preg_match('/^v[0-9]/', $highestVersion ?? '')
+            ? substr($highestVersion, 1)
+            : $highestVersion;
+
         if (!$highestVersion || substr($currentVersion, 0, 4) === 'dev-')  return false;
 
         return Comparator::compare($currentVersion, '<', $highestVersion);
