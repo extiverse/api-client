@@ -11,9 +11,9 @@
         }
     ],
     "require": {
-        "php": ">= 7.4",
+        "php": ">= 7.4 || ^8.0",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "7.3.* || 7.4.*",
+        "guzzlehttp/guzzle": "7.3.* || 7.4.* || 7.5.*",
         "guzzlehttp/psr7": "~1.1 || ^2.0",
         "illuminate/support": "8.*",
         "vlucas/phpdotenv": "^5.2",
