@@ -15,7 +15,6 @@ class Item extends \Swis\JsonApi\Client\Item
 
     protected function f($key)
     {
-        dump($key);
         return parent::getAttributeFromArray($key)
             ?? parent::getAttributeFromArray(Str::snake($key, '-'));
     }
