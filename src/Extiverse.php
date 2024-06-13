@@ -9,14 +9,10 @@ use Extiverse\Api\JsonApi\Repositories\UserRepository;
 use Extiverse\Api\JsonApi\Types\TypeMapper;
 use Extiverse\Api\JsonApi\Types\User\User;
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Utils;
 use Psr\SimpleCache\CacheInterface;
 use Swis\JsonApi\Client\Client as SwisClient;
 use Swis\JsonApi\Client\DocumentClient;
 use Swis\JsonApi\Client\Interfaces\DocumentClientInterface;
-use Swis\JsonApi\Client\Interfaces\TypeMapperInterface;
 use Swis\JsonApi\Client\Parsers\ResponseParser;
 
 class Extiverse
@@ -73,10 +69,10 @@ class Extiverse
         }
 
         $baseUri = $this->getTesting()
-            ? 'http://extiverse.test/'
-            : 'https://extiverse.com/';
+            ? 'http://flarum.test/'
+            : 'https://flarum.org/';
 
-        if ($api) $baseUri .= "api/v1/";
+        if ($api) $baseUri .= "api/";
 
         return new Client([
             'base_uri' => $baseUri,
